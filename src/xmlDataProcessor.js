@@ -17,6 +17,20 @@ export default class XmlClassicEditor extends ClassicEditor {
 }
 
 class XmlDataProcessor {
+  elementMap = {
+    orderedlist: 'ol',
+    listitem: 'li',
+    title: 'h2',
+    subtitle: 'h3',
+    para: 'p',
+    quote: 'b',
+    ulink: 'a'
+  }
+
+  attributeMap = {
+    url: 'href'
+  }
+
   toData(viewFragment) {
     console.log('data', viewFragment)
     // const json = []
@@ -43,32 +57,56 @@ class XmlDataProcessor {
     return viewFragment
   }
 
-  elementToView(element) {
-    const elementMap = {
-      orderedlist: 'ol',
-      listitem: 'li',
-      title: 'h1'
+  elementToTextView(element, parent) {
+    const { textContent } = element
+
+    // trim for now to remove identation, this should not be an issue
+    // when returned markup is minified
+    return new ViewText(textContent.trim())
+  }
+
+  attributesToValues(attributes) {
+    if (!attributes) {
+      return {}
     }
 
-    const { nodeName, attributes, children, textContent } = element
+    return Object.keys(attributes).reduce((acc, key) => {
+      const { name, value } = attributes[key]
 
-    const name = elementMap[nodeName] || nodeName
+      if (value) {
+        acc[this.attributeMap[name] || name] = value
+      }
+
+      return acc
+    }, {})
+  }
+
+  elementToView(element, parent) {
+    const { nodeName, attributes, childNodes: children } = element
+
+    const name = this.elementMap[nodeName] || nodeName
     // const name = elementMap[nodeName] || nodeName // kad napises sve mappinge onda liniju iznad zamjenis da actually throw-a ak dođe element kojeg ne znamo
     if (!name) {
       throw new Error(`No mapping for element '${nodeName}'`)
     }
-    // if (textContent) {
-    //   return new ViewText(textContent)
-    // }
 
-    const viewElement = new ViewElement(name, attributes)
+    const viewElement = new ViewElement(name, this.attributesToValues(attributes))
+
     if (children) {
       for (let child of children) {
-        const viewChild = this.elementToView(child)
+        const { nodeType, parentNode } = child
+        let viewChild
+        
+        if (nodeType === 3 || (parentNode && parentNode.nodeName === 'listitem')) {
+          viewChild = this.elementToTextView(child, element)
+        } else {
+          viewChild = this.elementToView(child, element)
+        }
+        
         viewElement._appendChild(viewChild)
       }
     }
-    console.log(viewElement)
+
     return viewElement
   }
 }

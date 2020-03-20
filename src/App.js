@@ -55,7 +55,7 @@ const XMLinitialData = `<section xmlns:pio="https://web.burza.hr/xmlns/podravkai
             <para>Fusce vitae vestibulum ligula.</para>
         </listitem>
     </itemizedlist>
-</section>`
+</section>`.replace(/^\s+|\r\n|\n|\r|(>)\s+(<)|\s+$/gm, '$1$2')
 
 const App = () => {
   let Ckeditor
