@@ -8,7 +8,7 @@ import Heading from '@ckeditor/ckeditor5-heading/src/heading'
 import ViewText from '@ckeditor/ckeditor5-engine/src/view/text'
 import ViewElement from '@ckeditor/ckeditor5-engine/src/view/element'
 import ViewDocumentFragment from '@ckeditor/ckeditor5-engine/src/view/documentfragment'
-
+//import * as Nesto from '@ckeditor/ckeditor5-engine/src/view/documentfragment'
 export const config = {
   plugins: [Essentials, Paragraph, Bold, Italic, List, Heading]
 }
@@ -43,7 +43,7 @@ class JsonDataProcessor {
     for (const childJson of jsonData) {
       const child = jsonToView(childJson)
 
-      viewFragment.appendChildren(child)
+      viewFragment._appendChild(child)
     }
 
     return viewFragment
@@ -82,30 +82,9 @@ function jsonToView(jsonObject) {
 
     for (const childJson of jsonObject.children) {
       const viewChild = jsonToView(childJson)
-      viewElement.appendChildren(viewChild)
+      viewElement._appendChild(viewChild)
     }
 
     return viewElement
   }
 }
-
-// JsonClassicEditor.create(document.querySelector('#editor'), {
-//   plugins: [Essentials, Paragraph, Bold, Italic, List, Heading],
-//   toolbar: [
-//     'headings',
-//     'bold',
-//     'italic',
-//     'bulletedList',
-//     'numberedList',
-//     'undo',
-//     'redo'
-//   ]
-// }).then(editor => {
-//   window.editor = editor
-// })
-
-// function getEditorData() {
-//   window.alert(window.editor.getData())
-// }
-
-//document.getElementById('getDataBtn').onclick = getEditorData
