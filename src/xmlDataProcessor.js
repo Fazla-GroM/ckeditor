@@ -46,11 +46,8 @@ class XmlDataProcessor {
   elementToView(element) {
     const elementMap = {
       orderedlist: 'ol',
-      //   itemizedlist: 'ul',
       listitem: 'li',
       title: 'h1'
-      //   subtitle: 'h3',
-      //   para: 'p'
     }
 
     const { nodeName, attributes, children, textContent } = element
